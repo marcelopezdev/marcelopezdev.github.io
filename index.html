@@ -1,43 +1,97 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Para Vos ❤️</title>
-  <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Boda de Ana & Juan</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto&display=swap" rel="stylesheet">
+<style>
+body {
+  margin:0; font-family:'Roboto', sans-serif; background:#fff;
+}
+header {
+  background: url('https://via.placeholder.com/1200x600') center/cover no-repeat;
+  height: 60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-shadow:0 0 10px #000;
+}
+header h1 { font-family:'Playfair Display', serif; font-size:3em; margin:0; }
+header p { font-size:1.5em; margin:10px 0 0 0; }
+
+section { padding:20px; max-width:1000px; margin:0 auto; }
+
+h2 { text-align:center; margin-bottom:20px; }
+
+#gallery { display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
+
+#gallery img { width:100%; border-radius:8px; object-fit:cover; }
+
+form { display:flex; flex-direction:column; align-items:center; margin-top:20px; }
+form input[type="file"] { margin-bottom:10px; }
+form button { padding:10px 20px; font-size:1em; cursor:pointer; border:none; border-radius:5px; background:#8b0000; color:#fff; }
+
+@media(max-width:600px){
+  header h1 { font-size:2em; }
+  header p { font-size:1em; }
+}
+</style>
 </head>
 <body>
 
-  <section class="hero">
-    <h1>Habíamos dicho que no regalos...</h1>
-    <button onclick="start()">Pero con vos nunca es tan simple</button>
-  </section>
+<header>
+  <h1>Ana & Juan</h1>
+  <p>24 de Octubre de 2026</p>
+</header>
 
-  <section class="content hidden" id="content">
+<section>
+  <h2>Galería de Invitados</h2>
+  <div id="gallery"></div>
 
-    <div class="gallery">
-      <img src="foto1.jpg">
-      <img src="foto2.jpg">
-      <img src="foto3.jpg">
-    </div>
+  <form id="uploadForm">
+    <input type="file" id="fileInput" multiple accept="image/*">
+    <button type="submit">Subir Foto</button>
+  </form>
+</section>
 
-    <div class="text">
-      <h2>Lo que valoro de vos</h2>
-      <ul>
-        <li>Tu fuerza incluso en días difíciles.</li>
-        <li>Cómo sos con Ian ❤️</li>
-        <li>Que siempre das más de lo que prometés.</li>
-        <li>Que me elegís incluso cuando no soy fácil.</li>
-      </ul>
-    </div>
+<script>
+const cloudName = 'TU_CLOUD_NAME'; // reemplaza con tu cloud name
+const uploadPreset = 'TU_UPLOAD_PRESET'; // reemplaza con tu upload preset
+const gallery = document.getElementById('gallery');
+const form = document.getElementById('uploadForm');
+const fileInput = document.getElementById('fileInput');
 
-    <div class="final">
-      <h2>Y como los acuerdos están para romperse...</h2>
-      <button onclick="showInvite()">¿Aceptás una cena conmigo esta noche?</button>
-      <p id="invite" class="hidden">Te paso a buscar a las 21:00. Prometo cocinar mejor que programo.</p>
-    </div>
+// Función para crear elemento de imagen en la galería
+function addImage(url) {
+  const img = document.createElement('img');
+  img.src = url;
+  gallery.appendChild(img);
+}
 
-  </section>
+// Subida de fotos a Cloudinary
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const files = fileInput.files;
+  if (!files.length) return alert('Selecciona al menos una foto');
 
-  <script src="script.js"></script>
+  for (let i = 0; i < files.length; i++) {
+    const formData = new FormData();
+    formData.append('file', files[i]);
+    formData.append('upload_preset', uploadPreset);
+
+    try {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      addImage(data.secure_url);
+    } catch (err) {
+      console.error(err);
+      alert('Error al subir la foto');
+    }
+  }
+
+  fileInput.value = '';
+});
+</script>
+
 </body>
 </html>
