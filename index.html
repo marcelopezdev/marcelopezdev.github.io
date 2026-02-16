@@ -3,93 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Boda de Ana & Juan</title>
+<title>Nuestra Boda</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto&display=swap" rel="stylesheet">
 <style>
 body {
-  margin:0; font-family:'Roboto', sans-serif; background:#fff;
+  margin:0;
+  font-family:'Roboto', sans-serif;
+  background:#f8f5f2;
+  display:flex;
+  justify-content:center;
 }
-header {
-  background: url('https://via.placeholder.com/1200x600') center/cover no-repeat;
-  height: 60vh; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-shadow:0 0 10px #000;
+.container {
+  width:100%;
+  max-width:400px;
+  margin-top:20px;
+  background:#fff;
+  border-radius:20px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
 }
-header h1 { font-family:'Playfair Display', serif; font-size:3em; margin:0; }
-header p { font-size:1.5em; margin:10px 0 0 0; }
+.header {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-bottom:20px;
+}
+.header img {
+  width:120px;
+  height:120px;
+  object-fit:cover;
+  border-radius:50%;
+  margin-bottom:15px;
+  border: 3px solid #ffe4e1;
+}
+.header h1 {
+  font-family:'Playfair Display', serif;
+  font-size:1.8em;
+  margin:0;
+  color:#333;
+}
+.header p {
+  margin:5px 0 0 0;
+  color:#666;
+}
 
-section { padding:20px; max-width:1000px; margin:0 auto; }
+.upload-btn {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:2px dashed #ccc;
+  border-radius:12px;
+  padding:20px;
+  cursor:pointer;
+  text-align:center;
+  margin-bottom:15px;
+  transition: all 0.2s ease;
+}
+.upload-btn:hover {
+  border-color:#ffb6c1;
+  background:#fff0f5;
+}
+.upload-btn input {
+  display:none;
+}
+.upload-btn span {
+  font-size:1em;
+  color:#555;
+}
 
-h2 { text-align:center; margin-bottom:20px; }
-
-#gallery { display:grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); gap:10px; }
-
-#gallery img { width:100%; border-radius:8px; object-fit:cover; }
-
-form { display:flex; flex-direction:column; align-items:center; margin-top:20px; }
-form input[type="file"] { margin-bottom:10px; }
-form button { padding:10px 20px; font-size:1em; cursor:pointer; border:none; border-radius:5px; background:#8b0000; color:#fff; }
-
-@media(max-width:600px){
-  header h1 { font-size:2em; }
-  header p { font-size:1em; }
+.gallery {
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
+.gallery img {
+  height:80px;
+  border-radius:10px;
+  object-fit:cover;
 }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>Ana & Juan</h1>
-  <p>24 de Octubre de 2026</p>
-</header>
+<div class="container">
+  <div class="header">
+    <img src="https://via.placeholder.com/150" alt="Novios">
+    <h1>Nuestra boda</h1>
+    <p>28 de junio de 2025</p>
+  </div>
 
-<section>
-  <h2>Galería de Invitados</h2>
-  <div id="gallery"></div>
-
-  <form id="uploadForm">
+  <label class="upload-btn">
     <input type="file" id="fileInput" multiple accept="image/*">
-    <button type="submit">Subir Foto</button>
-  </form>
-</section>
+    <span>☁ Subir imágenes</span>
+  </label>
+
+  <div class="gallery" id="gallery"></div>
+</div>
 
 <script>
-const cloudName = 'TU_CLOUD_NAME'; // reemplaza con tu cloud name
-const uploadPreset = 'TU_UPLOAD_PRESET'; // reemplaza con tu upload preset
-const gallery = document.getElementById('gallery');
-const form = document.getElementById('uploadForm');
+const cloudName = 'TU_CLOUD_NAME'; // tu cloud name
+const uploadPreset = 'TU_UPLOAD_PRESET'; // tu preset unsigned
 const fileInput = document.getElementById('fileInput');
+const gallery = document.getElementById('gallery');
 
-// Función para crear elemento de imagen en la galería
-function addImage(url) {
+function addImage(url){
   const img = document.createElement('img');
   img.src = url;
   gallery.appendChild(img);
 }
 
-// Subida de fotos a Cloudinary
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
+fileInput.addEventListener('change', async () => {
   const files = fileInput.files;
-  if (!files.length) return alert('Selecciona al menos una foto');
-
-  for (let i = 0; i < files.length; i++) {
+  if(!files.length) return;
+  
+  for(let i=0;i<files.length;i++){
     const formData = new FormData();
     formData.append('file', files[i]);
     formData.append('upload_preset', uploadPreset);
-
-    try {
+    try{
       const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/upload`, {
-        method: 'POST',
+        method:'POST',
         body: formData
       });
       const data = await res.json();
       addImage(data.secure_url);
-    } catch (err) {
+    } catch(err){
       console.error(err);
       alert('Error al subir la foto');
     }
   }
-
-  fileInput.value = '';
+  fileInput.value='';
 });
 </script>
 
